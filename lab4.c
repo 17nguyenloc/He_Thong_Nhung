@@ -8,12 +8,10 @@
 #include <esp_log.h>
 #include <time.h> 
 QueueHandle_t buffer; //Objeto de la cola
-clock_t t;
-
 /* structure that hold data*/
 typedef  struct{
 	int sender;
-	int counter;
+	int counter;	
 }Data;
 
 void sendTask1(void *arg) {
@@ -26,7 +24,7 @@ void sendTask1(void *arg) {
 	data1.counter = 1;
 	while (1) {
 		/* send data to front of the queue */
-       printf("time  %d : \t\t", t);
+
 		printf("sendTask1 is sending data \n");
 		xStatus = xQueueSendToFront(buffer, &data1, pdMS_TO_TICKS(100));
 		/* check whether sending is ok or not */
@@ -49,7 +47,7 @@ void sendTask2(void *arg) {/* keep the status of sending data */
 	data2.counter = 1;
 
 	while (1) {
-        printf("time  %d : \t\t", t);
+       
 		printf("sendTask2 is sending data \n");
 		/* send data to front of the queue */
 		xStatus = xQueueSendToFront(buffer, &data2, pdMS_TO_TICKS(100));
@@ -72,7 +70,7 @@ void sendTask3(void *arg) {/* keep the status of sending data */
 	data3.counter = 1;
 
 	while (1) {
-        printf("time  %d : \t\t", t);
+       
 		printf("sendTask3 is sending data \n");
 		/* send data to front of the queue */
 		xStatus = xQueueSendToFront(buffer, &data3, pdMS_TO_TICKS(100));
@@ -97,13 +95,21 @@ void receiveTask(void *arg) {
 	while (1) {
 
 		/* send data to front of the queue */
-		xStatus = xQueueReceive(buffer, &data, pdMS_TO_TICKS(5000));
+		xStatus = xQueueReceive(buffer, &data, pdMS_TO_TICKS(1000));
 		/* check whether sending is ok or not */
 		if (xStatus == pdPASS) {
-            printf("time  %d : \t\t", t);
+
 			printf("receiveTask got data: ");
 			printf("sender = ");
-			printf("%d\t",data.sender);
+			if(data.sender == 1 ){
+			printf("moto speed \n");
+			}
+			if(data.sender == 2 ){
+			printf(" set point \n");
+			}
+			if(data.sender == 3 ){
+			printf(" another task \n");
+			}
 			printf(" counter = \t");
 			printf("%d\t",data.counter);
 			printf("\n");
@@ -115,7 +121,7 @@ void receiveTask(void *arg) {
 
 
 void app_main() {
-    t = clock();
+   
 	buffer = xQueueCreate(5, sizeof(Data)+1); //crea la cola *buffer* con 10 slots de 4 Bytes
 	xTaskCreatePinnedToCore(sendTask1, "sendTask1", 10000, NULL, 2, NULL, 0); //Crea tarea que escribe valores en la cola
 	xTaskCreatePinnedToCore(sendTask2, "sendTask2", 10000, NULL, 2, NULL, 0); //Crea tarea que lee valores de la cola.
