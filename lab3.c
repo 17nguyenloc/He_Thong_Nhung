@@ -10,15 +10,10 @@
 //#define BLINK_LED 13
 #define GPIO_INPUT_IO_0 27
 int buttonCount = 0;
-int i= 0;
-SemaphoreHandle_t xSemaphore = NULL;
+int i = 0;
 TaskHandle_t printVariableTask = NULL;
-void IRAM_ATTR button_isr_handler(void* arg) {
-    // notify the button task
-    xSemaphoreGiveFromISR(xSemaphore, NULL);
-}
-// task that will react to button clicks
-void button_task(void* pvParameter) {
+
+void most_priority(void* pvParameter) {
    
     while(1){
          printf("111111111111111111111111111111111111\n");
@@ -51,7 +46,7 @@ void blinky(void *pvParameter)
 }
 void app_main()
 {   
-    xTaskCreate(&button_task, "button_task", 2048, NULL, 5, NULL);
+    xTaskCreate(&most_priority, "most_priority", 2048, NULL, 5, NULL);
     xTaskCreate(&hello_task, "hello_task", 2048, NULL, 4, NULL);
     xTaskCreate(&blinky, "blinky", 2048,NULL,3,NULL );
 }
